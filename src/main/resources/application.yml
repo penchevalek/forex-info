@@ -5,6 +5,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres_pass
+  jooq:
+    sql-dialect: org.hibernate.dialect.PostgreSQL94Dialect
 fixer:
   uri: http://data.fixer.io/api/latest
   accessKey: 4dd6fe7aecc57674789b8bd385d2eb12

@@ -1,6 +1,9 @@
 package com.penchevalek.forexinfo;
 
 import com.penchevalek.forexinfo.dto.JsonRequestDto;
+import com.penchevalek.forexinfo.dto.XmlCurrentInfoDto;
+import com.penchevalek.forexinfo.dto.XmlHistoryDto;
+import com.penchevalek.forexinfo.dto.XmlRequestDto;
 import com.penchevalek.forexinfo.model.ForexInfo;
 
 import java.math.BigDecimal;
@@ -21,7 +24,6 @@ public class TestObjectsFactory {
         return jsonRequestDto;
     }
 
-
     public static ForexInfo createForexInfo() {
         ForexInfo forexInfo = new ForexInfo();
         ForexInfo.ForexInfoId forexInfoId = new ForexInfo.ForexInfoId();
@@ -40,5 +42,26 @@ public class TestObjectsFactory {
         rates.put("HNL", BigDecimal.valueOf(26.970936));
         forexInfo.setRates(rates);
         return forexInfo;
+    }
+
+    public static XmlRequestDto createXmlRequestDtoForCurrentInfo() {
+        XmlRequestDto xmlRequestDto = new XmlRequestDto();
+        xmlRequestDto.setId("17");
+        XmlCurrentInfoDto currentInfoDto = new XmlCurrentInfoDto();
+        currentInfoDto.setCurrency(BASE);
+        currentInfoDto.setConsumer("Consumer");
+        xmlRequestDto.setGet(currentInfoDto);
+        return xmlRequestDto;
+    }
+
+    public static XmlRequestDto createXmlRequestDtoForHistoricalData() {
+        XmlRequestDto xmlRequestDto = new XmlRequestDto();
+        xmlRequestDto.setId("19");
+        XmlHistoryDto historyDto = new XmlHistoryDto();
+        historyDto.setCurrency(BASE);
+        historyDto.setConsumer("Consumer-2");
+        historyDto.setPeriod(24);
+        xmlRequestDto.setHistory(historyDto);
+        return xmlRequestDto;
     }
 }

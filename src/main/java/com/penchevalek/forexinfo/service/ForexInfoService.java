@@ -1,6 +1,8 @@
 package com.penchevalek.forexinfo.service;
 
 import com.penchevalek.forexinfo.dto.JsonRequestDto;
+import com.penchevalek.forexinfo.dto.XmlHistoryDto;
+import com.penchevalek.forexinfo.dto.XmlRequestDto;
 import com.penchevalek.forexinfo.exceptions.CurrencyNotSupportedException;
 import com.penchevalek.forexinfo.exceptions.DuplicatedRequestException;
 import com.penchevalek.forexinfo.mapper.ClientRequestMapper;
@@ -40,7 +42,21 @@ public class ForexInfoService {
     public List<ForexInfo> getHistoricalData(JsonRequestDto jsonRequestDto) {
         validateRequest(jsonRequestDto.getRequestId());
         clientRequestRepository.save(clientRequestMapper.map(jsonRequestDto));
-        return forexInfoRepository.findAllByForexInfoIdGreaterThanEqual(getForexInfoId(jsonRequestDto));
+        ForexInfo.ForexInfoId forexInfoId = getForexInfoId(jsonRequestDto.getPeriod(), jsonRequestDto.getCurrency());
+        return forexInfoRepository.findAllByForexInfoIdGreaterThanEqual(forexInfoId);
+    }
+
+    public List<ForexInfo> handleXmlRequest(XmlRequestDto xmlRequestDto) {
+        validateRequest(xmlRequestDto.getId());
+        clientRequestRepository.save(clientRequestMapper.map(xmlRequestDto));
+        if (xmlRequestDto.getHistory() == null) {
+            getLatestForexInfo(xmlRequestDto.getGet().getCurrency());
+            return List.of(getLatestForexInfo(xmlRequestDto.getGet().getCurrency()));
+        } else {
+            XmlHistoryDto history = xmlRequestDto.getHistory();
+            ForexInfo.ForexInfoId forexInfoId = getForexInfoId(history.getPeriod(), history.getCurrency());
+            return forexInfoRepository.findAllByForexInfoIdGreaterThanEqual(forexInfoId);
+        }
     }
 
     @Cacheable(value = "forexInfoCurrent")
@@ -60,13 +76,14 @@ public class ForexInfoService {
                 });
     }
 
-    private ForexInfo.ForexInfoId getForexInfoId(JsonRequestDto jsonRequestDto) {
-        if (jsonRequestDto.getPeriod() == null) {
+    private ForexInfo.ForexInfoId getForexInfoId(Integer period, String currency) {
+        if (period == null) {
+            log.warn(MISSING_PERIOD_EXCEPTION_MESSAGE);
             throw new IllegalArgumentException(MISSING_PERIOD_EXCEPTION_MESSAGE);
         }
-        Instant start = Instant.now().minus(jsonRequestDto.getPeriod(), ChronoUnit.HOURS);
+        Instant start = Instant.now().minus(period, ChronoUnit.HOURS);
         ForexInfo.ForexInfoId forexInfoId = new ForexInfo.ForexInfoId();
-        forexInfoId.setBase(jsonRequestDto.getCurrency());
+        forexInfoId.setBase(currency);
         forexInfoId.setTimestamp(start.getEpochSecond());
         return forexInfoId;
     }
