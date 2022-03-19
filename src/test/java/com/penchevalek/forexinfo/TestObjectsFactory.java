@@ -17,6 +17,7 @@ public class TestObjectsFactory {
         jsonRequestDto.setClient("Client-1");
         jsonRequestDto.setCurrency(BASE);
         jsonRequestDto.setTimestamp(2365478);
+        jsonRequestDto.setPeriod(12);
         return jsonRequestDto;
     }
 

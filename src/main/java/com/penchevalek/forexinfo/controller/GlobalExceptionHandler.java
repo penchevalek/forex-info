@@ -19,4 +19,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleCurrencyNotSupportedException(CurrencyNotSupportedException ex) {
         return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
