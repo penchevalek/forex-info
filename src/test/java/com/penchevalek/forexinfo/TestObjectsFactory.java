@@ -26,10 +26,8 @@ public class TestObjectsFactory {
 
     public static ForexInfo createForexInfo() {
         ForexInfo forexInfo = new ForexInfo();
-        ForexInfo.ForexInfoId forexInfoId = new ForexInfo.ForexInfoId();
-        forexInfoId.setTimestamp(123456L);
-        forexInfoId.setBase(BASE);
-        forexInfo.setForexInfoId(forexInfoId);
+        ForexInfo.ForexInfoId forexInfoId = new ForexInfo.ForexInfoId(123456L, BASE);
+        forexInfo.setId(forexInfoId);
         forexInfo.setDate(LocalDate.of(2022, 3, 19));
         HashMap<String, BigDecimal> rates = new HashMap<>();
         rates.put("STD", BigDecimal.valueOf(22897.252535));

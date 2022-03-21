@@ -12,7 +12,7 @@ public class ForexInfoMapper {
         ForexInfo.ForexInfoId forexInfoId = new ForexInfo.ForexInfoId();
         forexInfoId.setBase(forexInfoDto.getBase());
         forexInfoId.setTimestamp(forexInfoDto.getTimestamp());
-        forexInfo.setForexInfoId(forexInfoId);
+        forexInfo.setId(forexInfoId);
         forexInfo.setDate(forexInfoDto.getDate());
         forexInfo.setRates(forexInfoDto.getRates());
         return forexInfo;

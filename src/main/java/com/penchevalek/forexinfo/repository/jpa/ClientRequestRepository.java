@@ -1,4 +1,4 @@
-package com.penchevalek.forexinfo.repository;
+package com.penchevalek.forexinfo.repository.jpa;
 
 import com.penchevalek.forexinfo.model.ClientRequest;
 import org.springframework.data.jpa.repository.JpaRepository;

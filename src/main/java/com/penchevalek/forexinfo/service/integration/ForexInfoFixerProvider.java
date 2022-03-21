@@ -2,7 +2,7 @@ package com.penchevalek.forexinfo.service.integration;
 
 import com.penchevalek.forexinfo.dto.ForexInfoDto;
 import com.penchevalek.forexinfo.mapper.ForexInfoMapper;
-import com.penchevalek.forexinfo.repository.ForexInfoRepository;
+import com.penchevalek.forexinfo.repository.redis.ForexInfoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

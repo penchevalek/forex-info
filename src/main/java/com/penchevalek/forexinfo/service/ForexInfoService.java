@@ -6,9 +6,11 @@ import com.penchevalek.forexinfo.dto.XmlRequestDto;
 import com.penchevalek.forexinfo.exceptions.CurrencyNotSupportedException;
 import com.penchevalek.forexinfo.exceptions.DuplicatedRequestException;
 import com.penchevalek.forexinfo.mapper.ClientRequestMapper;
+import com.penchevalek.forexinfo.messaging.ClientRequestMessageSender;
+import com.penchevalek.forexinfo.model.ClientRequest;
 import com.penchevalek.forexinfo.model.ForexInfo;
-import com.penchevalek.forexinfo.repository.ClientRequestRepository;
-import com.penchevalek.forexinfo.repository.ForexInfoRepository;
+import com.penchevalek.forexinfo.repository.jpa.ClientRequestRepository;
+import com.penchevalek.forexinfo.repository.redis.ForexInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,23 +34,24 @@ public class ForexInfoService {
     private final ClientRequestRepository clientRequestRepository;
     private final ForexInfoRepository forexInfoRepository;
     private final ClientRequestMapper clientRequestMapper;
+    private final ClientRequestMessageSender messageSender;
 
     public ForexInfo getCurrentInfo(JsonRequestDto jsonRequestDto) {
         validateRequest(jsonRequestDto.getRequestId());
-        clientRequestRepository.save(clientRequestMapper.map(jsonRequestDto));
+        saveAndSend(clientRequestMapper.map(jsonRequestDto));
         return getLatestForexInfo(jsonRequestDto.getCurrency());
     }
 
     public List<ForexInfo> getHistoricalData(JsonRequestDto jsonRequestDto) {
         validateRequest(jsonRequestDto.getRequestId());
-        clientRequestRepository.save(clientRequestMapper.map(jsonRequestDto));
+        saveAndSend(clientRequestMapper.map(jsonRequestDto));
         ForexInfo.ForexInfoId forexInfoId = getForexInfoId(jsonRequestDto.getPeriod(), jsonRequestDto.getCurrency());
         return forexInfoRepository.findAllByForexInfoIdGreaterThanEqual(forexInfoId);
     }
 
     public List<ForexInfo> handleXmlRequest(XmlRequestDto xmlRequestDto) {
         validateRequest(xmlRequestDto.getId());
-        clientRequestRepository.save(clientRequestMapper.map(xmlRequestDto));
+        saveAndSend(clientRequestMapper.map(xmlRequestDto));
         if (xmlRequestDto.getHistory() == null) {
             getLatestForexInfo(xmlRequestDto.getGet().getCurrency());
             return List.of(getLatestForexInfo(xmlRequestDto.getGet().getCurrency()));
@@ -86,5 +89,10 @@ public class ForexInfoService {
         forexInfoId.setBase(currency);
         forexInfoId.setTimestamp(start.getEpochSecond());
         return forexInfoId;
+    }
+
+    private void saveAndSend(ClientRequest clientRequest) {
+        clientRequestRepository.save(clientRequest);
+        messageSender.sendMessage(clientRequest);
     }
 }
